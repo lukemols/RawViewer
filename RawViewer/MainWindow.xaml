@@ -1,0 +1,100 @@
+﻿<ribbon:RibbonWindow x:Class="RawViewer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ribbon="clr-namespace:System.Windows.Controls.Ribbon;assembly=System.Windows.Controls.Ribbon"
+        xmlns:local="clr-namespace:RawViewer"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="500" Width="800">
+    <Grid>
+        <!--Definizione della griglia-->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions >
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        
+        <ribbon:Ribbon x:Name="Ribbon" Title="Raw Viewer">
+            <!-- Parte dell'help -->
+            <ribbon:Ribbon.HelpPaneContent>
+                <ribbon:RibbonButton SmallImageSource="Images/Window/Help_16.png" Name="Aiuto" />
+            </ribbon:Ribbon.HelpPaneContent>
+
+            <!-- Parte della quick access toolbar (icone in alto a sinistra) -->
+            <Ribbon.QuickAccessToolBar>
+                <ribbon:RibbonQuickAccessToolBar>
+                    <ribbon:RibbonButton x:Name="quickOpenButton" SmallImageSource="Images/Window/OpenFile_16.png" Click="OpenButton_Click"/>
+                </ribbon:RibbonQuickAccessToolBar>
+            </Ribbon.QuickAccessToolBar>
+
+            <!-- Parte dell'application menu (quello che si tira giù con il click in alto a sinistra) -->
+            <Ribbon.ApplicationMenu>
+                <ribbon:RibbonApplicationMenu SmallImageSource="Images/Window/NewStyleSheet_16.bmp">
+                    <ribbon:RibbonApplicationMenuItem Header="Apri" ImageSource="Images/Window/OpenFile_32.png" Click="OpenButton_Click"/>
+                    
+                    <ribbon:RibbonApplicationMenuItem Header="Chiudi" ImageSource="Images/Window/CloseIcon_32.bmp" Click="CloseButton_Click"/>
+
+                </ribbon:RibbonApplicationMenu>
+            </Ribbon.ApplicationMenu>
+            
+            <!-- Parte del ribbon vero e proprio (i tab) -->
+            <!-- Primo tab -->
+            <ribbon:RibbonTab Header="Home">
+                <ribbon:RibbonGroup x:Name="RibbonGroupHomeOpenFile" Header="Apri File">
+                    <!-- Gruppo Apri file (velocizza) -->
+                    <ribbon:RibbonButton Label="Scegli file" LargeImageSource="Images/Window/Image_32.png" Click="OpenFileFromRibbonButton_Click"/>
+                    <!-- Combo box per scegliere la risoluzione -->
+                    <ribbon:RibbonComboBox Name="ResolutionComboBox" Label="Risoluzione" >
+                        <ribbon:RibbonComboBox.Items>
+                            <ribbon:RibbonGallery Name="ResolutionComboBoxGallery" SelectionChanged="ResolutionComboBox_SelectionChanged"
+                                             SelectedValue="256x256" SelectedValuePath="Content" MaxColumnCount="1">
+                                <ribbon:RibbonGalleryCategory x:Name="ResolutionComboBoxGalleryCategory" />
+                            </ribbon:RibbonGallery>
+                        </ribbon:RibbonComboBox.Items>
+                    </ribbon:RibbonComboBox>
+                    <!-- Textbox per scegliere le "fette" -->
+                    <ribbon:RibbonTextBox Name="SlicesTextBox" Label="Fette" Text="1" />
+                    <!-- Pulsante per avviare il caricamento -->
+                    <ribbon:RibbonButton Label="Carica immagine" SmallImageSource="Images/Window/ArrowImportOrLoad_16.png" Click="LoadImageButton_Click"/>
+
+                </ribbon:RibbonGroup>
+
+            </ribbon:RibbonTab>
+            <!-- Secondo Tab -->
+            <ribbon:RibbonTab Header="Algoritmi">
+
+            </ribbon:RibbonTab>
+        </ribbon:Ribbon>
+
+        <!-- FINE DEL RIBBON, inizia la finestra sotto -->
+        <Image Name="ImagePanel" Grid.Row="1"></Image>
+        
+        <!-- Fine dell'immagine, mostra sotto uno stackpanel orizzontale con pulsanti avanti, indietro e barra. -->
+        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Center">
+            <Button Name="BackButton" Click="BackButton_Click">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Images/Window/arrow_back_32.png" />
+                        <Label>Indietro</Label>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <TextBox Width="75" Name="FrameNumberTextBox" TextAlignment="Center"
+                     VerticalContentAlignment="Center" TextChanged="FrameNumberTextBox_TextChanged"></TextBox>
+            <Button Name="ForwardButton" Click="ForwardButton_Click">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Avanti</Label>
+                        <Image Source="Images/Window/arrow_Forward_32.png" />
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+        </StackPanel>
+        
+
+    </Grid>
+</ribbon:RibbonWindow>

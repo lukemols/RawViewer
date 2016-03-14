@@ -1,0 +1,41 @@
+﻿<Window x:Class="RawViewer.ImageParametersChoiceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RawViewer"
+        mc:Ignorable="d"
+        Title="ImageParametersChoiceWindow" Height="300" Width="450">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions >
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        
+        <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" 
+               FontWeight="Bold" FontSize="14">Larghezza dell'immagine (Pixel)</Label>
+        <TextBox x:Name="tbWidth" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" 
+               HorizontalAlignment="Left" FontWeight="Bold" FontSize="14" Width="150"></TextBox>
+        
+        <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" 
+               FontWeight="Bold" FontSize="14">Larghezza dell'immagine (Pixel)</Label>
+        <TextBox x:Name="tbHeight" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" 
+               HorizontalAlignment="Left" FontWeight="Bold" FontSize="14" Width="150"></TextBox>
+        
+        <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" 
+               FontWeight="Bold" FontSize="14">Fette dell'immagine</Label>
+        <TextBox x:Name="tbFrames" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" 
+               HorizontalAlignment="Left" FontSize="14" Width="150" FontWeight="Bold" ></TextBox>
+        
+        <Button x:Name="bnOK" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="10"
+            FontWeight="Bold" FontSize="14" Width="200" IsDefault="True" Click="bnOK_Click">Carica immagine
+        </Button>
+    </Grid>
+</Window>
