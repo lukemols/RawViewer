@@ -58,7 +58,7 @@ namespace RawViewer
             //Ottieni la cartella Desktop
             var pathWithEnv = @"%USERPROFILE%\Desktop";
             var Path = Environment.ExpandEnvironmentVariables(pathWithEnv);
-            Path = @"C:\Users\luca9\Desktop\Uni Files\2M\DIP\ESAME\File Di Test";
+            //Path = @"C:\Users\luca9\Desktop\Uni Files\2M\DIP\ESAME\File Di Test";
             ofd.InitialDirectory = Path;
             ofd.Filter = "Immagini raw (.raw)|*.raw";
 

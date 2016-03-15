@@ -12,13 +12,15 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions >
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         
-        <ribbon:Ribbon x:Name="Ribbon" Title="Raw Viewer">
+        <ribbon:Ribbon x:Name="Ribbon" Title="Raw Viewer" Grid.ColumnSpan="2">
             <!-- Parte dell'help -->
             <ribbon:Ribbon.HelpPaneContent>
                 <ribbon:RibbonButton SmallImageSource="Images/Window/Help_16.png" Name="Aiuto" />
@@ -71,10 +73,13 @@
         </ribbon:Ribbon>
 
         <!-- FINE DEL RIBBON, inizia la finestra sotto -->
-        <Image Name="ImagePanel" Grid.Row="1"></Image>
-        
-        <!-- Fine dell'immagine, mostra sotto uno stackpanel orizzontale con pulsanti avanti, indietro e barra. -->
-        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Center">
+        <Image Name="ImagePanel" Grid.Row="1" Grid.Column="0"></Image>
+        <Image Name="ImagePanelR" Grid.Row="1" Grid.Column="1"></Image>
+        <Image Name="ImagePanelG" Grid.Row="2" Grid.Column="0"></Image>
+        <Image Name="ImagePanelB" Grid.Row="2" Grid.Column="1"></Image>
+
+                        <!-- Fine dell'immagine, mostra sotto uno stackpanel orizzontale con pulsanti avanti, indietro e barra. -->
+        <StackPanel Orientation="Horizontal" Grid.Row="3" HorizontalAlignment="Center"  Grid.ColumnSpan="2">
             <Button Name="BackButton" Click="BackButton_Click">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal">
