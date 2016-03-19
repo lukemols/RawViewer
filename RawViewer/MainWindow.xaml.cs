@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls.Ribbon;
 using Microsoft.Win32;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -14,9 +15,11 @@ namespace RawViewer
     public partial class MainWindow : RibbonWindow
     {
         LoadFileClass loadFileObj;
-        string filePath;
+        string[] filePaths;
         int imageIndex;
         int maxImageIndex;
+
+        Image[] panels;
         
         /// <summary>
         /// Costruttore di default
@@ -26,24 +29,47 @@ namespace RawViewer
             InitializeComponent();
             List<string> resolutions = new List<string>(new string[] { "181x217", "256x256", "512x512", "Seleziona manualmente" });
             ResolutionComboBoxGalleryCategory.ItemsSource = resolutions;
-            filePath = "";
+            filePaths = new string[] { "" };
+            panels = new Image[] { ImagePanel, ImagePanelR, ImagePanelG, ImagePanelB };
+            NavigationButtons.Visibility = Visibility.Collapsed;
         }
 
-        void SetImage()
+        void SetImage(int index = 0)
         {
-            imageIndex = 0;
-            maxImageIndex = loadFileObj.Frames - 1;
-            ImagePanel.Source = loadFileObj.GetImageFromIndex(imageIndex);
-            FrameNumberTextBox.Text = imageIndex + "/" + maxImageIndex; 
-        }
-
-        void SetImage(int index)
-        {
+            NavigationButtons.Visibility = Visibility.Visible;
             maxImageIndex = loadFileObj.Frames - 1;
             if (index < 0 || index > maxImageIndex)
                 return;
             imageIndex = index;
-            ImagePanel.Source = loadFileObj.GetImageFromIndex(imageIndex);
+            BitmapSource[] sources = loadFileObj.GetImageFromIndex(imageIndex);
+            if(loadFileObj.SingleImage)
+            {
+                ImagePanel.Source = sources[0];
+                ImagePanel.Visibility = Visibility.Visible;
+                ImagePanelR.Visibility = Visibility.Hidden;
+                ImagePanelG.Visibility = Visibility.Hidden;
+                ImagePanelB.Visibility = Visibility.Hidden;
+            }
+            else if (loadFileObj.FilePaths.Length == 3)
+            {
+                ImagePanelR.Source = sources[0];
+                ImagePanelG.Source = sources[1];
+                ImagePanelB.Source = sources[2];
+                ImagePanel.Visibility = Visibility.Collapsed;
+                ImagePanelR.Visibility = Visibility.Visible;
+                ImagePanelG.Visibility = Visibility.Visible;
+                ImagePanelB.Visibility = Visibility.Visible;
+            }
+            else if (loadFileObj.FilePaths.Length == 4)
+            {
+                ImagePanel.Source = sources[0];
+                ImagePanelR.Source = sources[1];
+                ImagePanelG.Source = sources[2];
+                ImagePanelB.Source = sources[3];
+                ImagePanelR.Visibility = Visibility.Visible;
+                ImagePanelG.Visibility = Visibility.Visible;
+                ImagePanelB.Visibility = Visibility.Visible;
+            }
             FrameNumberTextBox.Text = imageIndex + "/" + maxImageIndex;
         }
 
@@ -58,16 +84,23 @@ namespace RawViewer
             //Ottieni la cartella Desktop
             var pathWithEnv = @"%USERPROFILE%\Desktop";
             var Path = Environment.ExpandEnvironmentVariables(pathWithEnv);
-            //Path = @"C:\Users\luca9\Desktop\Uni Files\2M\DIP\ESAME\File Di Test";
+            Path = @"C:\Users\luca9\Desktop\Uni Files\2M\DIP\ESAME\File Di Test";
             ofd.InitialDirectory = Path;
             ofd.Filter = "Immagini raw (.raw)|*.raw";
+            ofd.Multiselect = true;
 
             Nullable<bool> result = ofd.ShowDialog();
 
             if (result == true)
             {
-                filePath = ofd.FileName;
-                return true;
+                int l = ofd.FileNames.Length;
+                if (l == 1 || l == 3 || l == 4)
+                {
+                    filePaths = ofd.FileNames;
+                    return true;
+                }
+                else
+                    return false;
             }
             return false;
         }
@@ -77,7 +110,7 @@ namespace RawViewer
         /// </summary>
         private void ManualParametersSelection()
         {
-            loadFileObj = new LoadFileClass(filePath);
+            loadFileObj = new LoadFileClass(filePaths);
             ImageParametersChoiceWindow imgParams = new ImageParametersChoiceWindow(loadFileObj);
             if ((bool)imgParams.ShowDialog())
                 SetImage();
@@ -96,6 +129,8 @@ namespace RawViewer
             {
                 ManualParametersSelection();
             }
+            else
+                MessageBox.Show("Non è stato caricato nessun file. Rimarrà in memoria il vecchio percorso.", "Attenzione");
         }
 
         /// <summary>
@@ -106,9 +141,7 @@ namespace RawViewer
         private void OpenFileFromRibbonButton_Click(object sender, RoutedEventArgs e)
         {
             if(!ShowDialogOpenFile())
-            {
                 MessageBox.Show("Non è stato caricato nessun file. Rimarrà in memoria il vecchio percorso.", "Attenzione");
-            }
         }
         
         /// <summary>
@@ -118,7 +151,7 @@ namespace RawViewer
         /// <param name="e"></param>
         private void LoadImageButton_Click(object sender, RoutedEventArgs e)
         {
-            if(filePath != null)
+            if(filePaths != null)
             {
                 if(ResolutionComboBoxGallery.SelectedItem.ToString() == "Seleziona manualmente")
                 {
@@ -134,7 +167,7 @@ namespace RawViewer
                             int w = Convert.ToInt32(wh[0]);
                             int h = Convert.ToInt32(wh[1]);
                             int f = Convert.ToInt32(SlicesTextBox.Text);
-                            loadFileObj = new LoadFileClass(filePath, w, h, f);
+                            loadFileObj = new LoadFileClass(filePaths, w, h, f);
                             SetImage();
                         }
                         catch
@@ -156,7 +189,6 @@ namespace RawViewer
         private void ResolutionComboBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
             string s = ResolutionComboBoxGallery.SelectedItem.ToString();
-            MessageBox.Show(s);
         }
         
         private void BackButton_Click(object sender, RoutedEventArgs e)
@@ -171,7 +203,7 @@ namespace RawViewer
         #endregion
 
         private void FrameNumberTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
+        {   
             string[] s = FrameNumberTextBox.Text.Split('/');
             try
             {
@@ -181,6 +213,22 @@ namespace RawViewer
             }
             catch
             { }
+        }
+
+        private void ImagePanel_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var p = e.GetPosition((System.Windows.Controls.Image)sender);
+            int x = (int)(loadFileObj.Width / ImagePanel.ActualWidth * p.X);
+            int y = (int)(loadFileObj.Height / ImagePanel.ActualHeight * p.Y);
+            MessageBox.Show(p.ToString() + ", x: " + x + ", y: " + y);
+        }
+
+        private void ImagePanel_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            if (e.Delta > 0) //Rotellina su
+                SetImage(imageIndex - 1);
+            else
+                SetImage(imageIndex + 1);
         }
     }
 }

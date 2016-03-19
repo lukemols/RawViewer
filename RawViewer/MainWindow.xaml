@@ -10,10 +10,10 @@
     <Grid>
         <!--Definizione della griglia-->
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/> <!--Riga del ribbon-->
+            <RowDefinition Height="*"/> <!--Riga delle immagini 1 e R-->
+            <RowDefinition Height="*"/> <!--Riga delle immagini G e B-->
+            <RowDefinition Height="Auto"/> <!--Riga della barra con pulsanti avanti e indietro, e della tbox con numero frame-->
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions >
             <ColumnDefinition Width="*" />
@@ -37,7 +37,7 @@
             <Ribbon.ApplicationMenu>
                 <ribbon:RibbonApplicationMenu SmallImageSource="Images/Window/NewStyleSheet_16.bmp">
                     <ribbon:RibbonApplicationMenuItem Header="Apri" ImageSource="Images/Window/OpenFile_32.png" Click="OpenButton_Click"/>
-                    
+                    <ribbon:RibbonApplicationMenuItem Header="Apri file RGB" ImageSource="Images/Window/OpenFile_32.png" Click="OpenButton_Click"/>
                     <ribbon:RibbonApplicationMenuItem Header="Chiudi" ImageSource="Images/Window/CloseIcon_32.bmp" Click="CloseButton_Click"/>
 
                 </ribbon:RibbonApplicationMenu>
@@ -73,13 +73,15 @@
         </ribbon:Ribbon>
 
         <!-- FINE DEL RIBBON, inizia la finestra sotto -->
-        <Image Name="ImagePanel" Grid.Row="1" Grid.Column="0"></Image>
-        <Image Name="ImagePanelR" Grid.Row="1" Grid.Column="1"></Image>
-        <Image Name="ImagePanelG" Grid.Row="2" Grid.Column="0"></Image>
-        <Image Name="ImagePanelB" Grid.Row="2" Grid.Column="1"></Image>
+            <Image Name="ImagePanel" Grid.Row="1" Grid.Column="0" MouseLeftButtonDown="ImagePanel_MouseLeftButtonDown" MouseWheel="ImagePanel_MouseWheel" />
+            <Image Name="ImagePanelR" Grid.Row="1" Grid.Column="1" MouseLeftButtonDown="ImagePanel_MouseLeftButtonDown" MouseWheel="ImagePanel_MouseWheel" />
+            <Image Name="ImagePanelG" Grid.Row="2" Grid.Column="0" MouseLeftButtonDown="ImagePanel_MouseLeftButtonDown" MouseWheel="ImagePanel_MouseWheel" />
+            <Image Name="ImagePanelB" Grid.Row="2" Grid.Column="1" MouseLeftButtonDown="ImagePanel_MouseLeftButtonDown" MouseWheel="ImagePanel_MouseWheel" />
 
-                        <!-- Fine dell'immagine, mostra sotto uno stackpanel orizzontale con pulsanti avanti, indietro e barra. -->
-        <StackPanel Orientation="Horizontal" Grid.Row="3" HorizontalAlignment="Center"  Grid.ColumnSpan="2">
+        
+       <!-- Fine delle immagini, mostra sotto uno stackpanel orizzontale con pulsanti avanti, indietro e barra. -->
+        <StackPanel Name="NavigationButtons" Orientation="Horizontal" Grid.Row="3"
+                    HorizontalAlignment="Center" Grid.ColumnSpan="2" Margin="0, 15, 0, 0">
             <Button Name="BackButton" Click="BackButton_Click">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal">
