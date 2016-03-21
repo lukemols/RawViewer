@@ -6,18 +6,18 @@ using System.Windows.Media.Imaging;
 
 namespace RawViewer
 {
-    public class LoadFileClass
+    public class RawImageClass
     {
-        int width;
+        int width; //Larghezza delle img
         public int Width { get { return width; } }
 
-        int height;
+        int height; //altezza delle img
         public int Height { get { return height; } }
 
-        int frames;
+        int frames; //numero di frame
         public int Frames { get { return frames; } }
 
-        int pixelCount;
+        int pixelCount; //numero di pixel totali
         public int PixelCount { get { return pixelCount; } }
 
         // Percorsi dei file
@@ -32,15 +32,28 @@ namespace RawViewer
         public string[] FilePaths { get { return filePaths; } }
 
         bool needParameters;
+        /// <summary>
+        /// Indica se c'è bisogno di inserire i parametri
+        /// </summary>
         public bool NeedParameters { get { return needParameters; } }
 
         bool singleImage;
+        /// <summary>
+        /// Indica se è stata caricata una sola img
+        /// </summary>
         public bool SingleImage { get { return singleImage; } }
         
         byte[][] streams; //array di stream
         List<byte[]>[] imgs; //array di liste di immagini
 
-        public LoadFileClass(string[] paths, int w = 0, int h = 0, int f = 0)
+        /// <summary>
+        /// Costruttore della classe
+        /// </summary>
+        /// <param name="paths">Array di percorsi</param>
+        /// <param name="w">Larghezza delle img (default 0 -> indicare successivamente con SetParams)</param>
+        /// <param name="h">Altezza delle img (default 0 -> indicare successivamente con SetParams)</param>
+        /// <param name="f">Numero di frame delle img (default 0 -> indicare successivamente con SetParams)</param>
+        public RawImageClass(string[] paths, int w = 0, int h = 0, int f = 0)
         {
             width = w; height = h; frames = f; pixelCount = 0;
             filePaths = paths;
@@ -52,27 +65,36 @@ namespace RawViewer
                 singleImage = true;
             else
                 singleImage = false;
-
+            ///Inizializza gli array
             for (int i = 0; i < imgs.Length; i++)
                 imgs[i] = new List<byte[]>();
-
+            //carica gli stream. LoadStream prende in ingresso streams[i] e lo ritorna come uscita tramite out
             for (int i = 0; i < streams.Length; i++)
             {
                 LoadStream(filePaths[i], out streams[i]);
             }
-
-            if (width * height * frames == pixelCount)
-            {
+            //Controlla se i dati sono corretti
+            if (CheckParams())
+            {//Se si crea i frame
                 CreateFrames();
                 needParameters = false;
-            }
+            } //altrimenti richiedi i parametri
             else
                 needParameters = true;
         }
 
+        /// <summary>
+        /// Metodo che setta i parametri
+        /// </summary>
+        /// <param name="w">Larghezza</param>
+        /// <param name="h">Altezza</param>
+        /// <param name="f">Numero di frame</param>
         public void SetParams(int w, int h, int f)
-        {
+        {//Controlla che i conti tornino
             width = w; height = h; frames = f;
+            if (!CheckParams())
+                return;
+            //Se si allora si può continuare
             needParameters = false;
             foreach(List<byte[]> l in imgs)
                 l.Clear();
@@ -80,6 +102,23 @@ namespace RawViewer
             // Questo nel caso in cui si aprano nuove immagini
             // dopo averne aperta una (o più).
             CreateFrames();
+        }
+
+        /// <summary>
+        /// Metodo che controlla i parametri inseriti
+        /// </summary>
+        /// <returns></returns>
+        public bool CheckParams()
+        {//Controlla se coincidono le dimensioni e il numero di frame con il numero di pixel
+            if (!(width * height * frames == pixelCount))
+                return false;
+            foreach(byte[] s in streams)
+            {//E se tutte le immagini hanno lo stesso numero di pixel
+                if (s.Length != pixelCount)
+                    return false;
+            }
+            //Se tutto va bene torna true, se invece anche solo che una sola cosa è errata torna false
+            return true;
         }
 
         /// <summary>
@@ -120,8 +159,9 @@ namespace RawViewer
         /// </summary>
         void CreateFrames()
         {
+            //Prendi ogni stream (j)
             for (int j = 0; j < streams.Length; j++)
-            {
+            {//Calcola la grandezza come w*h e crea i frame
                 int i = 0;
                 int imageSize = width * height;
                 for (int f = 0; f < frames; f++)
@@ -137,7 +177,7 @@ namespace RawViewer
         }
 
         /// <summary>
-        /// Metodo che ritorna un array di BitmapSource relative al frame indicato
+        /// Metodo che ritorna un array di BitmapSource relative al frame indicato in formato Scala di Grigi
         /// </summary>
         /// <param name="i">Indice del frame</param>
         /// <returns>Array di immagini del frame</returns>

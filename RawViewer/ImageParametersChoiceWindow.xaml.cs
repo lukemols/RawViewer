@@ -19,31 +19,45 @@ namespace RawViewer
     /// </summary>
     public partial class ImageParametersChoiceWindow : Window
     {
-        LoadFileClass loadFileObj;
+        RawImageClass rawImageObj;
 
-        public ImageParametersChoiceWindow(LoadFileClass lfc)
+        /// <summary>
+        /// Costruttore
+        /// </summary>
+        /// <param name="ric">Riferimento all'oggetto RawImageClass</param>
+        public ImageParametersChoiceWindow(RawImageClass ric)
         {
             InitializeComponent();
-            loadFileObj = lfc;
+            rawImageObj = ric;
         }
 
+        /// <summary>
+        /// Metodo che controlla il click su ok
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void bnOK_Click(object sender, RoutedEventArgs e)
         {
-            int w = Convert.ToInt32(tbWidth.Text);
-            int h = Convert.ToInt32(tbHeight.Text);
-            int f = Convert.ToInt32(tbFrames.Text);
-
-            if (w * h * f != loadFileObj.PixelCount)
+            try
             {
-                MessageBox.Show("Le dimensioni inserite non coincidono. Riprova per favore.",
-                    "Errore dimensioni immagine.", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                //Ottieni le dimensioni inserite (nel try perché convertiamo)
+                int w = Convert.ToInt32(tbWidth.Text);
+                int h = Convert.ToInt32(tbHeight.Text);
+                int f = Convert.ToInt32(tbFrames.Text);
+                //Se le dimensioni sono sbagliate segnala errore
+                if (w * h * f != rawImageObj.PixelCount)
+                {
+                    MessageBox.Show("Le dimensioni inserite non coincidono. Riprova per favore.",
+                        "Errore dimensioni immagine.", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                else
+                {//altrimenti setta i parametri e chiudi la dialog con risultato true
+                    rawImageObj.SetParams(w, h, f);
+                    this.DialogResult = true;
+                }
             }
-            else
-            {
-                loadFileObj.SetParams(w, h, f);
-                this.DialogResult = true;
-            }
+            catch { }
         }
     }
 }

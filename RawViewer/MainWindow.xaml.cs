@@ -14,63 +14,67 @@ namespace RawViewer
     /// </summary>
     public partial class MainWindow : RibbonWindow
     {
-        LoadFileClass loadFileObj;
-        string[] filePaths;
-        int imageIndex;
-        int maxImageIndex;
+        RawImageClass rawImageObj; //Istanza della classe che gestisce le immagini
+        string[] filePaths; //Percorsi dei file
+        int imageIndex; //Indice del frame
+        int maxImageIndex; //Numero max di frame
 
-        Image[] panels;
-        
+        Image[] panels; //Pannelli delle immagini
+
         /// <summary>
         /// Costruttore di default
         /// </summary>
         public MainWindow()
         {
             InitializeComponent();
+            //Lista delle risoluzioni. Questa viene visualizzata nella prima scheda del ribbon
             List<string> resolutions = new List<string>(new string[] { "181x217", "256x256", "512x512", "Seleziona manualmente" });
-            ResolutionComboBoxGalleryCategory.ItemsSource = resolutions;
-            filePaths = new string[] { "" };
-            panels = new Image[] { ImagePanel, ImagePanelR, ImagePanelG, ImagePanelB };
-            NavigationButtons.Visibility = Visibility.Collapsed;
+            ResolutionComboBoxGalleryCategory.ItemsSource = resolutions; //aggiungi le risoluzioni
+            filePaths = new string[] { "" };//Setta i percorsi ad un array vuoto
+            panels = new Image[] { ImagePanel, ImagePanelR, ImagePanelG, ImagePanelB }; //Setta i pannelli delle immagini
+            NavigationButtons.Visibility = Visibility.Collapsed; //Nascondi i pulsanti avanti - indietro...
         }
 
+        /// <summary>
+        /// Metodo che mostra l'immagine sui pannelli
+        /// </summary>
+        /// <param name="index">Indice del frame</param>
         void SetImage(int index = 0)
         {
+            //Mostra i pulsanti avanti - indietro..
             NavigationButtons.Visibility = Visibility.Visible;
-            maxImageIndex = loadFileObj.Frames - 1;
-            if (index < 0 || index > maxImageIndex)
+            maxImageIndex = rawImageObj.Frames - 1;
+            if (index < 0 || index > maxImageIndex) //Controlla se si è alla fine o all'inizio dei frame (nel caso non fare nulla)
                 return;
-            imageIndex = index;
-            BitmapSource[] sources = loadFileObj.GetImageFromIndex(imageIndex);
-            if(loadFileObj.SingleImage)
+            imageIndex = index; //Indice attuale
+            BitmapSource[] sources = rawImageObj.GetImageFromIndex(imageIndex); //ottieni le immagini
+            if (rawImageObj.SingleImage) //Se c'è una sola img mostra il primo pannello
             {
-                ImagePanel.Source = sources[0];
-                ImagePanel.Visibility = Visibility.Visible;
-                ImagePanelR.Visibility = Visibility.Hidden;
-                ImagePanelG.Visibility = Visibility.Hidden;
-                ImagePanelB.Visibility = Visibility.Hidden;
+                panels[0].Visibility = Visibility.Visible;
+                panels[0].Source = sources[0];
+                for (int i = 1; i < panels.Length; i++)
+                {
+                    panels[i].Visibility = Visibility.Collapsed;
+                }
             }
-            else if (loadFileObj.FilePaths.Length == 3)
+            else if (rawImageObj.FilePaths.Length == 3) //Se 3 mostrale sui pannelli RGB
             {
-                ImagePanelR.Source = sources[0];
-                ImagePanelG.Source = sources[1];
-                ImagePanelB.Source = sources[2];
-                ImagePanel.Visibility = Visibility.Collapsed;
-                ImagePanelR.Visibility = Visibility.Visible;
-                ImagePanelG.Visibility = Visibility.Visible;
-                ImagePanelB.Visibility = Visibility.Visible;
+                panels[0].Visibility = Visibility.Collapsed;
+                for (int i = 1; i < panels.Length; i++)
+                {
+                    panels[i].Visibility = Visibility.Visible;
+                    panels[i].Source = sources[i - 1];
+                }
             }
-            else if (loadFileObj.FilePaths.Length == 4)
+            else if (rawImageObj.FilePaths.Length == 4)//Se 4 mostrale su tutti i pannelli
             {
-                ImagePanel.Source = sources[0];
-                ImagePanelR.Source = sources[1];
-                ImagePanelG.Source = sources[2];
-                ImagePanelB.Source = sources[3];
-                ImagePanelR.Visibility = Visibility.Visible;
-                ImagePanelG.Visibility = Visibility.Visible;
-                ImagePanelB.Visibility = Visibility.Visible;
+                for (int i = 0; i < panels.Length; i++)
+                {
+                    panels[i].Visibility = Visibility.Visible;
+                    panels[i].Source = sources[i];
+                }
             }
-            FrameNumberTextBox.Text = imageIndex + "/" + maxImageIndex;
+            FrameNumberTextBox.Text = imageIndex + "/" + maxImageIndex; //Mostra numero del frame nella textbox
         }
 
         /// <summary>
@@ -84,18 +88,18 @@ namespace RawViewer
             //Ottieni la cartella Desktop
             var pathWithEnv = @"%USERPROFILE%\Desktop";
             var Path = Environment.ExpandEnvironmentVariables(pathWithEnv);
-            Path = @"C:\Users\luca9\Desktop\Uni Files\2M\DIP\ESAME\File Di Test";
+            //Path = @"C:\Users\luca9\Desktop\Uni Files\2M\DIP\ESAME\File Di Test"; //decommenta e cambia cartella in fase di debug per velocizzare
             ofd.InitialDirectory = Path;
             ofd.Filter = "Immagini raw (.raw)|*.raw";
-            ofd.Multiselect = true;
-
+            ofd.Multiselect = true;//Abilita selezione multipla
+            //ottieni il risultato
             Nullable<bool> result = ofd.ShowDialog();
 
             if (result == true)
-            {
+            {//Controlla che l'utente abbia deciso di aprire 1, 3 o 4 immagini
                 int l = ofd.FileNames.Length;
                 if (l == 1 || l == 3 || l == 4)
-                {
+                {//Se si aggiungi ai percorsi dei file i file selezionati
                     filePaths = ofd.FileNames;
                     return true;
                 }
@@ -110,9 +114,9 @@ namespace RawViewer
         /// </summary>
         private void ManualParametersSelection()
         {
-            loadFileObj = new LoadFileClass(filePaths);
-            ImageParametersChoiceWindow imgParams = new ImageParametersChoiceWindow(loadFileObj);
-            if ((bool)imgParams.ShowDialog())
+            rawImageObj = new RawImageClass(filePaths);
+            ImageParametersChoiceWindow imgParams = new ImageParametersChoiceWindow(rawImageObj);
+            if ((bool)imgParams.ShowDialog()) //se la finestra di selezione parametri ritorna true allora apri l'immagine
                 SetImage();
         }
 
@@ -125,7 +129,8 @@ namespace RawViewer
         /// <param name="e"></param>
         private void OpenButton_Click(object sender, RoutedEventArgs e)
         {
-            if(ShowDialogOpenFile())
+            //Se la selezione file va a buon fine apri la finestra per l'inserimento dei parametri
+            if (ShowDialogOpenFile())
             {
                 ManualParametersSelection();
             }
@@ -140,10 +145,11 @@ namespace RawViewer
         /// <param name="e"></param>
         private void OpenFileFromRibbonButton_Click(object sender, RoutedEventArgs e)
         {
-            if(!ShowDialogOpenFile())
+            //Se la selezione file non va a buon fine mostra un messaggio d'errore
+            if (!ShowDialogOpenFile())
                 MessageBox.Show("Non è stato caricato nessun file. Rimarrà in memoria il vecchio percorso.", "Attenzione");
         }
-        
+
         /// <summary>
         /// Metodo generato dal click sul pulsante carica immagine del gruppo nel tab
         /// </summary>
@@ -151,84 +157,125 @@ namespace RawViewer
         /// <param name="e"></param>
         private void LoadImageButton_Click(object sender, RoutedEventArgs e)
         {
-            if(filePaths != null)
-            {
-                if(ResolutionComboBoxGallery.SelectedItem.ToString() == "Seleziona manualmente")
+            //Controlla che ci siano dei percorsi
+            if (filePaths.Length > 0)
+            {//Se è selezionato seleziona manualmente apri selezione parametri
+                if (ResolutionComboBoxGallery.SelectedItem.ToString() == "Seleziona manualmente")
                 {
                     ManualParametersSelection();
                 }
                 else
-                {
+                {//altrimenti converti la stringa inserita nella combo box dei parametri
                     string[] wh = ResolutionComboBoxGallery.SelectedItem.ToString().Split('x');
-                    if(wh.Length == 2)
+                    if (wh.Length == 2)//(o almeno provaci ;) )
                     {
                         try
                         {
                             int w = Convert.ToInt32(wh[0]);
                             int h = Convert.ToInt32(wh[1]);
                             int f = Convert.ToInt32(SlicesTextBox.Text);
-                            loadFileObj = new LoadFileClass(filePaths, w, h, f);
-                            SetImage();
+                            rawImageObj = new RawImageClass(filePaths, w, h, f);
+                            SetImage(); //Se tutto va bene carica le immagini
                         }
                         catch
-                        {
+                        {//altrimenti mostra un errore
                             MessageBox.Show("Errore durante la conversione dei parametri inseriti. Controlla la loro validità.", "Errore");
                         }
                     }
-                    
+
                 }
             }
         }
-        
 
+        /// <summary>
+        /// Metodo che chiude l'applicazione
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("CLOSE WINDOW");
         }
 
-        private void ResolutionComboBox_SelectionChanged(object sender, RoutedEventArgs e)
-        {
-            string s = ResolutionComboBoxGallery.SelectedItem.ToString();
-        }
-        
+        /// <summary>
+        /// Metodo che gestisce il click sul pulsante indietro
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             SetImage(imageIndex - 1);
         }
 
+        /// <summary>
+        /// Metodo che gestisce il click sul pulsante avanti
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ForwardButton_Click(object sender, RoutedEventArgs e)
         {
             SetImage(imageIndex + 1);
         }
-        #endregion
 
+        /// <summary>
+        /// Metodo che gestisce il cambio del testo nella textbox
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FrameNumberTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {   
+        {//Prova a convertire la prima parte della scritta (quella prima di / )
             string[] s = FrameNumberTextBox.Text.Split('/');
             try
             {
                 int i = Convert.ToInt32(s[0]);
-                if(i != imageIndex)
-                    SetImage(i);
+                if (i != imageIndex)
+                    SetImage(i);//se ci riesci cambia immagine
             }
             catch
-            { }
+            { } //Altrimenti non fare nulla
         }
 
+        #endregion
+
+        #region Azioni sulle immagini (Click del mouse e scroll della rotellina
+
+        /// <summary>
+        /// Metodo che gestisce il click del mouse (SINISTRO) sull'immagine
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ImagePanel_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            /*Siccome l'immagine può variare la sua dimensione all'interno della finestra si procede così:
+                ottieni la posizione del mouse all'interno del controllo immagine.
+                ottieni le x e y reali facendo il rapporto tra la dimensione dell'immagine e quella del controllo
+                (altezza e larghezza) e moltiplicale per la posizione del mouse all'interno del controllo.
+                In pratica è una proporzione: p.X : panel.Width = pixel.X : image.Width (lo stesso per y)
+                
+            **** ATTENZIONE: ****
+            Questo metodo è chiamato indifferentemente per ogni pannello. 
+            Nel caso in cui si volesse sapere quale pannello ha scatenato l'evento, controllate SENDER.
+            */
             var p = e.GetPosition((System.Windows.Controls.Image)sender);
-            int x = (int)(loadFileObj.Width / ImagePanel.ActualWidth * p.X);
-            int y = (int)(loadFileObj.Height / ImagePanel.ActualHeight * p.Y);
-            MessageBox.Show(p.ToString() + ", x: " + x + ", y: " + y);
+            int x = (int)(rawImageObj.Width / ImagePanel.ActualWidth * p.X);
+            int y = (int)(rawImageObj.Height / ImagePanel.ActualHeight * p.Y);
+            MessageBox.Show("Hai cliccato nelle coordinate x: " + x + ", y: " + y + " dell'immagine.");
+            // Qui sopra c'è un esempio di utilizzo delle coordinate calcolate. Modifica a seconda della necessità.
+            
         }
 
+        /// <summary>
+        /// Metodo che gestisce il movimento della rotellina del mouse sopra l'immagine
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ImagePanel_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
-        {
+        {//Se va su torna indietro di una img, altrimenti vai avanti
             if (e.Delta > 0) //Rotellina su
                 SetImage(imageIndex - 1);
             else
                 SetImage(imageIndex + 1);
         }
+        #endregion
     }
 }

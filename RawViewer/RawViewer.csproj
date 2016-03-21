@@ -71,7 +71,7 @@
     <Compile Include="ImageParametersChoiceWindow.xaml.cs">
       <DependentUpon>ImageParametersChoiceWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="LoadFileClass.cs" />
+    <Compile Include="RawImageClass.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

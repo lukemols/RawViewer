@@ -37,7 +37,6 @@
             <Ribbon.ApplicationMenu>
                 <ribbon:RibbonApplicationMenu SmallImageSource="Images/Window/NewStyleSheet_16.bmp">
                     <ribbon:RibbonApplicationMenuItem Header="Apri" ImageSource="Images/Window/OpenFile_32.png" Click="OpenButton_Click"/>
-                    <ribbon:RibbonApplicationMenuItem Header="Apri file RGB" ImageSource="Images/Window/OpenFile_32.png" Click="OpenButton_Click"/>
                     <ribbon:RibbonApplicationMenuItem Header="Chiudi" ImageSource="Images/Window/CloseIcon_32.bmp" Click="CloseButton_Click"/>
 
                 </ribbon:RibbonApplicationMenu>
@@ -52,7 +51,7 @@
                     <!-- Combo box per scegliere la risoluzione -->
                     <ribbon:RibbonComboBox Name="ResolutionComboBox" Label="Risoluzione" >
                         <ribbon:RibbonComboBox.Items>
-                            <ribbon:RibbonGallery Name="ResolutionComboBoxGallery" SelectionChanged="ResolutionComboBox_SelectionChanged"
+                            <ribbon:RibbonGallery Name="ResolutionComboBoxGallery"
                                              SelectedValue="256x256" SelectedValuePath="Content" MaxColumnCount="1">
                                 <ribbon:RibbonGalleryCategory x:Name="ResolutionComboBoxGalleryCategory" />
                             </ribbon:RibbonGallery>
@@ -68,7 +67,12 @@
             </ribbon:RibbonTab>
             <!-- Secondo Tab -->
             <ribbon:RibbonTab Header="Algoritmi">
+                <ribbon:RibbonGroup x:Name="RibbonGroupAlgo1" Header="Algoritmi su istogrammi">
+                    <ribbon:RibbonButton Label="Vedi istogramma" LargeImageSource="Images/Window/Image_32.png"/>
+                </ribbon:RibbonGroup>
+                <ribbon:RibbonGroup x:Name="RibbonGroupAlgo2" Header="Algoritmi su altro">
 
+                </ribbon:RibbonGroup>
             </ribbon:RibbonTab>
         </ribbon:Ribbon>
 
