@@ -259,7 +259,7 @@ namespace RawViewer
             var p = e.GetPosition((System.Windows.Controls.Image)sender);
             int x = (int)(rawImageObj.Width / ImagePanel.ActualWidth * p.X);
             int y = (int)(rawImageObj.Height / ImagePanel.ActualHeight * p.Y);
-            MessageBox.Show("Hai cliccato nelle coordinate x: " + x + ", y: " + y + " dell'immagine.");
+            MessageBox.Show("Hai cliccato nelle coordinate x: " + x + ", y: " + y + " dell'immagine " + imageIndex + ".");
             // Qui sopra c'è un esempio di utilizzo delle coordinate calcolate. Modifica a seconda della necessità.
             
         }
